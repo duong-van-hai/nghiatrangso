@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nghĩa Trang Nhân Dân Số - Cõi Vĩnh Hằng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Roboto', sans-serif; }
+        .serif { font-family: 'Playfair Display', serif; }
+        .bg-stone { background-color: #f5f5f0; }
+        .grayscale { filter: grayscale(100%); }
+        .grayscale:hover { filter: grayscale(0%); transition: 0.7s; }
+    </style>
+</head>
+<body class="bg-stone text-stone-800">
+
+<div id="app">
+    <nav class="bg-white/90 sticky top-0 z-50 border-b border-stone-200 shadow-sm p-4">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1 @click="selectedPerson = null" class="serif text-2xl font-bold tracking-widest text-stone-700 uppercase cursor-pointer">
+                Nghĩa Trang Nhân Dân Số
+            </h1>
+            <div class="relative w-full md:w-80">
+                <input v-model="searchTerm" type="text" placeholder="Tìm tên người thân..." 
+                    class="w-full pl-4 pr-4 py-2 bg-stone-100 border-none rounded-full focus:ring-2 focus:ring-stone-300 outline-none text-sm">
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 py-10">
+        
+        <div v-if="!selectedPerson">
+            <header class="text-center mb-16">
+                <h2 class="serif text-4xl font-light text-stone-600 mb-2">Không Gian Tưởng Niệm</h2>
+                <p class="text-stone-400 italic">"Nơi ký ức trở nên vĩnh cửu qua thời gian"</p>
+            </header>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div v-for="person in filteredMemorials" :key="person.id" 
+                    @click="selectedPerson = person"
+                    class="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all cursor-pointer border border-stone-100">
+                    <img :src="person.image" class="w-28 h-28 rounded-full mx-auto mb-6 grayscale object-cover ring-4 ring-stone-50">
+                    <h3 class="serif text-xl font-bold text-center mb-1">{{ person.name }}</h3>
+                    <p class="text-center text-stone-400 text-xs tracking-widest mb-4">{{ person.birth }} — {{ person.death }}</p>
+                    <div class="flex justify-center gap-6 text-stone-400 pt-4 border-t border-stone-50 text-xs">
+                        <span>🔥 {{ person.candles }}</span>
+                        <span>🌸 {{ person.flowers }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-else class="max-w-4xl mx-auto">
+            <button @click="selectedPerson = null" class="flex items-center gap-2 text-stone-400 hover:text-stone-700 mb-8 transition-colors">
+                ← Quay về danh sách
+            </button>
+
+            <div class="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-stone-100">
+                <div class="h-32 bg-stone-200"></div>
+                <div class="px-8 md:px-16 pb-16 relative">
+                    <div class="flex flex-col items-center -mt-16">
+                        <img :src="selectedPerson.image" class="w-40 h-40 rounded-full border-[10px] border-white shadow-xl grayscale object-cover">
+                        <h2 class="serif text-4xl font-bold mt-6 text-stone-800 tracking-wider text-center">{{ selectedPerson.name }}</h2>
+                        <p class="text-stone-400 italic my-2">{{ selectedPerson.birth }} — {{ selectedPerson.death }}</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-12 mt-12">
+                        <div class="md:col-span-2">
+                            <h4 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4">Tiểu sử</h4>
+                            <p class="text-stone-600 leading-relaxed text-lg mb-10">{{ selectedPerson.bio }}</p>
+
+                            <hr class="mb-10">
+
+                            <h4 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-6">Sổ tang tri ân</h4>
+                            <div class="mb-8">
+                                <textarea v-model="newMsg" class="w-full p-4 bg-stone-50 border rounded-2xl outline-none focus:ring-2 focus:ring-stone-200" rows="3" placeholder="Gửi lời nhắn..."></textarea>
+                                <button @click="addMessage" class="mt-2 bg-stone-800 text-white px-6 py-2 rounded-xl hover:bg-black transition">Gửi tri ân</button>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div v-for="m in currentMessages" :key="m.id" class="p-4 bg-stone-50 rounded-xl">
+                                    <p class="text-xs text-stone-400 mb-1">{{ m.date }} • Một người thân kính viếng</p>
+                                    <p class="text-stone-700">{{ m.text }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="sticky top-24 p-6 bg-stone-50 rounded-2xl border border-stone-100">
+                                <h4 class="text-[10px] font-bold uppercase text-stone-400 text-center mb-4">Nghi lễ</h4>
+                                <button @click="interact('candles')" class="w-full py-4 bg-white border rounded-xl mb-3 hover:bg-orange-50 transition flex justify-between px-4">
+                                    <span>🔥 Thắp nhang</span>
+                                    <span class="font-bold text-orange-700">{{ selectedPerson.candles }}</span>
+                                </button>
+                                <button @click="interact('flowers')" class="w-full py-4 bg-white border rounded-xl hover:bg-emerald-50 transition flex justify-between px-4">
+                                    <span>🌸 Dâng hoa</span>
+                                    <span class="font-bold text-emerald-700">{{ selectedPerson.flowers }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-10 text-center text-stone-400 text-xs uppercase tracking-widest">
+        © 2026 Nghĩa Trang Nhân Dân Số - Tri ân và Gìn giữ Ký ức
+    </footer>
+</div>
+
+<script>
+    const { createApp } = Vue
+
+    createApp({
+        data() {
+            return {
+                searchTerm: '',
+                selectedPerson: null,
+                newMsg: '',
+                // Dữ liệu ban đầu
+                memorials: [
+                    { id: 1, name: "Nguyễn Bá Ngọc", birth: "1952", death: "1964", bio: "Người anh hùng thiếu niên dũng cảm cứu em nhỏ trong bom đạn tại Thanh Hóa.", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8Y6rR9Mv6z2Xm3z-F-o_GzW-2N0L7p5Z7vQ&s", candles: 1540, flowers: 820 },
+                    { id: 2, name: "Kim Đồng", birth: "1929", death: "1943", bio: "Người đội trưởng đầu tiên của Đội Thiếu niên Tiền phong Hồ Chí Minh.", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzNscw2p4qCAsVatG8_6k5N_Y_vS_8z9k56A&s", candles: 2100, flowers: 1500 },
+                    { id: 3, name: "Võ Thị Sáu", birth: "1933", death: "1952", bio: "Nữ anh hùng huyền thoại vùng Đất Đỏ, biểu tượng của lòng yêu nước bất khuất.", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2G4I7XG4O3G6H-Xz7U6J9M9z6X6Y6z6X6Y6z", candles: 3500, flowers: 2800 }
+                ],
+                messages: {}
+            }
+        },
+        computed: {
+            filteredMemorials() {
+                return this.memorials.filter(p => p.name.toLowerCase().includes(this.searchTerm.toLowerCase()))
+            },
+            currentMessages() {
+                return this.selectedPerson ? (this.messages[this.selectedPerson.id] || []) : []
+            }
+        },
+        methods: {
+            interact(type) {
+                this.selectedPerson[type]++
+                this.saveData()
+            },
+            addMessage() {
+                if (!this.newMsg.trim()) return
+                const pId = this.selectedPerson.id
+                if (!this.messages[pId]) this.messages[pId] = []
+                
+                this.messages[pId].unshift({
+                    id: Date.now(),
+                    text: this.newMsg,
+                    date: new Date().toLocaleDateString('vi-VN')
+                })
+                this.newMsg = ''
+                this.saveData()
+            },
+            saveData() {
+                localStorage.setItem('memorial_db_html', JSON.stringify(this.memorials))
+                localStorage.setItem('messages_db_html', JSON.stringify(this.messages))
+            },
+            loadData() {
+                const db = localStorage.getItem('memorial_db_html')
+                const msgs = localStorage.getItem('messages_db_html')
+                if (db) this.memorials = JSON.parse(db)
+                if (msgs) this.messages = JSON.parse(msgs)
+            }
+        },
+        mounted() {
+            this.loadData()
+        }
+    }).mount('#app')
+</script>
+
+</body>
+</html>
