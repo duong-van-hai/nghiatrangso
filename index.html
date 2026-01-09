@@ -8,184 +8,111 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Roboto', sans-serif; background-color: #f8f7f2; }
+        body { font-family: 'Roboto', sans-serif; background-color: #f8f7f2; color: #444; }
         .serif { font-family: 'Playfair Display', serif; }
-        .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-        .hero-gradient { background: linear-gradient(to bottom, #ffffff, #f8f7f2); }
+        .grayscale { filter: grayscale(100%); transition: 0.5s; }
+        .grayscale:hover { filter: grayscale(0%); }
+        .card-shadow { box-shadow: 0 10px 30px -12px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-stone-200 p-4">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-                <h1 @click="selectedPerson = null" class="serif text-xl font-bold tracking-tighter text-stone-800 cursor-pointer uppercase">
-                    Nghĩa Trang Nhân Dân Số
-                </h1>
+    <nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-stone-200 p-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1 @click="selectedPerson = null" class="serif text-xl font-bold tracking-tighter text-stone-800 cursor-pointer uppercase">
+                Nghĩa Trang Nhân Dân Số
+            </h1>
+            
+            <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                <input v-model="searchTerm" type="text" placeholder="Tìm tên, quê quán..." 
+                    class="flex-grow md:w-64 px-4 py-2 bg-stone-100 rounded-full text-sm outline-none focus:ring-2 focus:ring-stone-300">
                 
-                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                    <input v-model="searchTerm" type="text" placeholder="Tìm tên, quê quán, đơn vị..." 
-                        class="flex-grow lg:w-64 px-4 py-2 bg-stone-100 border-none rounded-lg focus:ring-2 focus:ring-stone-300 outline-none text-sm">
-                    
-                    <select v-model="filterType" class="px-3 py-2 bg-stone-100 rounded-lg text-sm outline-none border-none">
-                        <option value="">Tất cả đối tượng</option>
-                        <option value="liệt sĩ">Anh hùng/Liệt sĩ</option>
-                        <option value="dân thường">Người dân</option>
-                        <option value="người nước ngoài">Người nước ngoài</option>
-                        <option value="kiều bào">Người Việt ở nước ngoài</option>
-                    </select>
-
-                    <select v-model="filterProvince" class="px-3 py-2 bg-stone-100 rounded-lg text-sm outline-none border-none">
-                        <option value="">Tất cả các tỉnh</option>
-                        <option v-for="p in provinces" :key="p" :value="p">{{ p }}</option>
-                    </select>
-                </div>
+                <select v-model="filterType" class="px-3 py-2 bg-stone-100 rounded-full text-sm outline-none">
+                    <option value="">Tất cả đối tượng</option>
+                    <option value="liệt sĩ">Liệt sĩ/Anh hùng</option>
+                    <option value="người nước ngoài">Người nước ngoài</option>
+                    <option value="kiều bào">Kiều bào</option>
+                    <option value="dân thường">Dân thường</option>
+                </select>
             </div>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-6 py-10">
-        
         <div v-if="!selectedPerson">
-            <header class="text-center mb-12">
-                <h2 class="serif text-3xl font-light text-stone-700">Cõi Vĩnh Hằng</h2>
-                <p class="text-stone-500 mt-2 text-sm uppercase tracking-widest">Lưu giữ ký ức cho triệu người con đất Việt</p>
-            </header>
+            <div class="text-center mb-12">
+                <h2 class="serif text-4xl font-light text-stone-700 mb-2">Không Gian Tưởng Niệm</h2>
+                <p class="text-stone-400 italic">"Vì một triệu ký ức bất tử qua thời gian"</p>
+            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 <div v-for="person in filteredMemorials" :key="person.id" 
                     @click="selectedPerson = person"
-                    class="bg-white rounded-xl p-6 card-shadow hover:-translate-y-1 transition-all cursor-pointer border border-stone-100">
+                    class="bg-white rounded-2xl p-6 card-shadow hover:-translate-y-2 transition-all cursor-pointer border border-stone-100 flex flex-col items-center text-center">
                     
-                    <div class="flex items-center gap-4 mb-4">
-                        <img :src="person.image || 'https://via.placeholder.com/150'" class="w-16 h-16 rounded-full grayscale object-cover ring-2 ring-stone-100">
-                        <div>
-                            <h3 class="serif text-lg font-bold text-stone-800">{{ person.name }}</h3>
-                            <p class="text-[10px] text-emerald-700 font-bold uppercase tracking-tighter">{{ person.type }}</p>
-                        </div>
-                    </div>
+                    <img :src="person.image || 'https://via.placeholder.com/150?text=Ký+Ức'" 
+                         class="w-24 h-24 rounded-full grayscale object-cover mb-4 ring-4 ring-stone-50">
                     
-                    <div class="space-y-1 mb-4">
-                        <p class="text-xs text-stone-500 flex items-center gap-1">
-                            <span>📅</span> {{ person.birth }} — {{ person.death }}
-                        </p>
-                        <p class="text-xs text-stone-500 flex items-center gap-1">
-                            <span>🏠</span> {{ person.homeTown.province }}
-                        </p>
-                    </div>
+                    <span class="text-[9px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-1 rounded mb-2">{{ person.type }}</span>
+                    <h3 class="serif text-xl font-bold text-stone-800">{{ person.name }}</h3>
+                    <p class="text-xs text-stone-400 mb-4">{{ person.birth }} — {{ person.death }}</p>
+                    <p class="text-xs text-stone-500 italic mb-4">🏠 {{ person.homeTown.province }}</p>
 
-                    <div class="flex justify-between items-center pt-4 border-t border-stone-50">
-                        <span class="text-[10px] text-stone-400">🔥 {{ person.candles }} Tri ân</span>
-                        <span class="text-[10px] text-stone-400">🌸 {{ person.flowers }} Dâng hoa</span>
+                    <div class="mt-auto w-full pt-4 border-t border-stone-50 flex justify-around text-[10px] text-stone-400 font-bold">
+                        <span>🔥 {{ person.candles }}</span>
+                        <span>🌸 {{ person.flowers }}</span>
                     </div>
                 </div>
             </div>
-            
-            <div v-if="filteredMemorials.length === 0" class="text-center py-20 text-stone-400">
-                Không tìm thấy thông tin phù hợp trong dữ liệu.
-            </div>
         </div>
 
-        <div v-else class="max-w-5xl mx-auto">
-            <button @click="selectedPerson = null" class="mb-6 text-stone-500 hover:text-stone-800 flex items-center gap-2">
+        <div v-else class="max-w-4xl mx-auto animate-in fade-in duration-500">
+            <button @click="selectedPerson = null" class="mb-6 text-stone-500 hover:text-black transition flex items-center gap-2">
                 ← Quay lại danh sách
             </button>
 
-            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-stone-100">
-                <div class="md:flex">
-                    <div class="md:w-1/3 bg-stone-50 p-10 flex flex-col items-center border-r border-stone-100">
-                        <img :src="selectedPerson.image" class="w-48 h-48 rounded-full border-8 border-white shadow-lg grayscale mb-6 object-cover">
-                        <div class="w-full space-y-3">
-                            <button @click="interact('candles')" class="w-full py-3 bg-white border rounded-xl hover:bg-orange-50 transition flex justify-between px-4 text-sm">
-                                <span>🔥 Thắp nhang</span>
-                                <span class="font-bold">{{ selectedPerson.candles }}</span>
-                            </button>
-                            <button @click="interact('flowers')" class="w-full py-3 bg-white border rounded-xl hover:bg-emerald-50 transition flex justify-between px-4 text-sm">
-                                <span>🌸 Dâng hoa</span>
-                                <span class="font-bold">{{ selectedPerson.flowers }}</span>
-                            </button>
+            <div class="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-stone-100 md:flex">
+                <div class="md:w-1/3 bg-stone-50 p-10 flex flex-col items-center text-center">
+                    <img :src="selectedPerson.image || 'https://via.placeholder.com/150'" class="w-40 h-40 rounded-full grayscale object-cover shadow-xl border-4 border-white mb-6">
+                    <h2 class="serif text-2xl font-bold">{{ selectedPerson.name }}</h2>
+                    <p class="text-stone-400 text-sm mb-6">{{ selectedPerson.birth }} — {{ selectedPerson.death }}</p>
+                    
+                    <div class="w-full space-y-2">
+                        <button @click="interact('candles')" class="w-full py-3 bg-white border rounded-xl hover:bg-orange-50 transition text-sm flex justify-between px-4">
+                            <span>🔥 Thắp nhang</span> <b>{{ selectedPerson.candles }}</b>
+                        </button>
+                        <button @click="interact('flowers')" class="w-full py-3 bg-white border rounded-xl hover:bg-emerald-50 transition text-sm flex justify-between px-4">
+                            <span>🌸 Dâng hoa</span> <b>{{ selectedPerson.flowers }}</b>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="md:w-2/3 p-10">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <div class="bg-stone-50 p-4 rounded-2xl">
+                            <label class="text-[10px] uppercase font-bold text-stone-400 block mb-1">Quê quán</label>
+                            <span class="text-sm">{{ selectedPerson.homeTown.commune }}, {{ selectedPerson.homeTown.district }}, {{ selectedPerson.homeTown.province }}</span>
+                        </div>
+                        <div class="bg-stone-50 p-4 rounded-2xl">
+                            <label class="text-[10px] uppercase font-bold text-stone-400 block mb-1">Nơi an nghỉ</label>
+                            <span class="text-sm">{{ selectedPerson.restingPlace.locationName }} ({{ selectedPerson.restingPlace.country }})</span>
                         </div>
                     </div>
-
-                    <div class="md:w-2/3 p-10">
-                        <div class="mb-8">
-                            <span class="px-3 py-1 bg-stone-800 text-white text-[10px] rounded-full uppercase tracking-widest">{{ selectedPerson.type }}</span>
-                            <h2 class="serif text-4xl font-bold mt-4 text-stone-800">{{ selectedPerson.name }}</h2>
-                            <p class="text-stone-500 italic mt-2">{{ selectedPerson.birth }} — {{ selectedPerson.death }}</p>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 text-sm">
-                            <div class="p-4 bg-stone-50 rounded-xl">
-                                <p class="text-stone-400 uppercase text-[10px] font-bold mb-1">Quê quán</p>
-                                <p class="text-stone-700">{{ selectedPerson.homeTown.commune }}, {{ selectedPerson.homeTown.district }}, {{ selectedPerson.homeTown.province }}</p>
-                            </div>
-                            <div v-if="selectedPerson.deathPlace" class="p-4 bg-stone-50 rounded-xl">
-                                <p class="text-stone-400 uppercase text-[10px] font-bold mb-1">Nơi hy sinh/mất</p>
-                                <p class="text-stone-700">{{ selectedPerson.deathPlace }}</p>
-                            </div>
-                            <div class="p-4 bg-stone-50 rounded-xl">
-                                <p class="text-stone-400 uppercase text-[10px] font-bold mb-1">Nơi an nghỉ</p>
-                                <p class="text-stone-700">{{ selectedPerson.restingPlace.locationName }} ({{ selectedPerson.restingPlace.country }})</p>
-                            </div>
-                            <div v-if="selectedPerson.unit" class="p-4 bg-stone-50 rounded-xl">
-                                <p class="text-stone-400 uppercase text-[10px] font-bold mb-1">Đơn vị / Chức vụ</p>
-                                <p class="text-stone-700">{{ selectedPerson.unit }} - {{ selectedPerson.rank }}</p>
-                            </div>
-                        </div>
-
-                        <div class="mb-10">
-                            <h4 class="text-[10px] font-bold uppercase text-stone-400 mb-4 tracking-widest border-b pb-2">Tiểu sử / Ghi chép</h4>
-                            <p class="text-stone-600 leading-relaxed">{{ selectedPerson.bio }}</p>
-                        </div>
-                    </div>
+                    
+                    <h4 class="text-[10px] uppercase font-bold text-stone-400 mb-4 tracking-widest border-b pb-2">Tiểu sử thông tin</h4>
+                    <p class="text-stone-600 leading-relaxed italic">{{ selectedPerson.bio }}</p>
                 </div>
             </div>
         </div>
     </main>
 
-    <footer class="py-20 text-center text-stone-400 text-[10px] uppercase tracking-[0.2em]">
-        Hệ thống dữ liệu số quốc gia - Vì một triệu ký ức bất tử
+    <footer class="py-10 text-center text-stone-400 text-[10px] uppercase tracking-widest">
+        © 2026 Nghĩa Trang Nhân Dân Số - Tri ân và Gìn giữ Ký ức
     </footer>
 </div>
 
-<script type="module">
-    // Giả lập dữ liệu từ data.js (Sau này bạn sẽ tách file này ra)
-    const rawData = [
-        {
-            id: "LS001",
-            type: "liệt sĩ",
-            name: "Võ Thị Sáu",
-            birth: "1933",
-            death: "1952",
-            homeTown: { province: "Bà Rịa - Vũng Tàu", district: "Đất Đỏ", commune: "Phước Long Thọ" },
-            deathPlace: "Nhà tù Côn Đảo",
-            unit: "Đội Công an xung phong Đất Đỏ",
-            rank: "Đội viên",
-            restingPlace: { locationName: "Nghĩa trang Hàng Dương", country: "Việt Nam" },
-            bio: "Nữ anh hùng huyền thoại của vùng Đất Đỏ, hy sinh khi tuổi đời còn rất trẻ.",
-            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2G4I7XG4O3G6H-Xz7U6J9M9z6X6Y6z6X6Y6z",
-            candles: 4500,
-            flowers: 3200
-        },
-        {
-            id: "NN001",
-            type: "người nước ngoài",
-            name: "Moritz Schlesinger",
-            birth: "1886",
-            death: "1948",
-            homeTown: { province: "Berlin", district: "-", commune: "-" },
-            deathPlace: "Việt Bắc",
-            unit: "Cố vấn Chính phủ",
-            rank: "Chiến sĩ quốc tế",
-            restingPlace: { locationName: "Nghĩa trang Bất Bạt, Hà Nội", country: "Việt Nam" },
-            bio: "Ông là một người Đức tình nguyện đứng trong hàng ngũ Việt Minh, đóng góp cho nền độc lập của Việt Nam.",
-            image: "",
-            candles: 200,
-            flowers: 150
-        }
-    ];
-
+<script>
     const { createApp } = Vue;
 
     createApp({
@@ -193,11 +120,39 @@
             return {
                 searchTerm: '',
                 filterType: '',
-                filterProvince: '',
                 selectedPerson: null,
-                memorials: rawData,
-                // Danh sách tỉnh để lọc (có thể lấy tự động từ data)
-                provinces: [...new Set(rawData.map(p => p.homeTown.province))]
+                // Dữ liệu mẫu gộp vào đây để code chạy được ngay không cần server
+                memorials: [
+                    {
+                        id: 1, type: "liệt sĩ", name: "Võ Thị Sáu", birth: "1933", death: "1952",
+                        homeTown: { province: "Bà Rịa - Vũng Tàu", district: "Đất Đỏ", commune: "Phước Long Thọ" },
+                        restingPlace: { locationName: "Nghĩa trang Hàng Dương", country: "Việt Nam" },
+                        bio: "Nữ anh hùng huyền thoại của vùng Đất Đỏ, hy sinh khi tuổi đời còn rất trẻ.",
+                        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2G4I7XG4O3G6H-Xz7U6J9M9z6X6Y6z6X6Y6z",
+                        candles: 4500, flowers: 3200
+                    },
+                    {
+                        id: 2, type: "người nước ngoài", name: "Moritz Schlesinger", birth: "1886", death: "1948",
+                        homeTown: { province: "Berlin", district: "-", commune: "-" },
+                        restingPlace: { locationName: "Nghĩa trang Bất Bạt, Hà Nội", country: "Việt Nam" },
+                        bio: "Chiến sĩ quốc tế người Đức, người bạn lớn của nhân dân Việt Nam.",
+                        image: "", candles: 540, flowers: 210
+                    },
+                    {
+                        id: 3, type: "liệt sĩ", name: "Nguyễn Văn Trỗi", birth: "1940", death: "1964",
+                        homeTown: { province: "Quảng Nam", district: "Điện Bàn", commune: "Thanh Quýt" },
+                        restingPlace: { locationName: "Nghĩa trang liệt sĩ TP. HCM", country: "Việt Nam" },
+                        bio: "Anh hùng lực lượng vũ trang nhân dân với lời hô bất tử trên pháp trường.",
+                        image: "", candles: 8900, flowers: 5600
+                    },
+                    {
+                        id: 4, type: "kiều bào", name: "Phạm Ngọc Thảo", birth: "1922", death: "1965",
+                        homeTown: { province: "Vĩnh Long", district: "-", commune: "-" },
+                        restingPlace: { locationName: "Nghĩa trang liệt sĩ TP. HCM", country: "Việt Nam" },
+                        bio: "Nhà tình báo chiến lược xuất sắc của quân đội nhân dân Việt Nam.",
+                        image: "", candles: 2100, flowers: 900
+                    }
+                ]
             }
         },
         computed: {
@@ -206,19 +161,26 @@
                     const matchName = p.name.toLowerCase().includes(this.searchTerm.toLowerCase()) || 
                                      p.homeTown.province.toLowerCase().includes(this.searchTerm.toLowerCase());
                     const matchType = this.filterType ? p.type === this.filterType : true;
-                    const matchProvince = this.filterProvince ? p.homeTown.province === this.filterProvince : true;
-                    
-                    return matchName && matchType && matchProvince;
-                })
+                    return matchName && matchType;
+                });
             }
         },
         methods: {
             interact(type) {
                 this.selectedPerson[type]++;
-                // Lưu vào LocalStorage hoặc gửi API
+                // Lưu dữ liệu vào máy người dùng
+                localStorage.setItem('memorial_data_v2', JSON.stringify(this.memorials));
+            },
+            loadSavedData() {
+                const saved = localStorage.getItem('memorial_data_v2');
+                if (saved) this.memorials = JSON.parse(saved);
             }
+        },
+        mounted() {
+            this.loadSavedData();
         }
-    }).mount('#app')
+    }).mount('#app');
 </script>
+
 </body>
 </html>
