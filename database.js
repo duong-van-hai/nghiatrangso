@@ -1,13 +1,24 @@
-// PART 1: DANH TÍNH CỐT LÕI
+/**
+ * HỆ THỐNG DỮ LIỆU NGHĨA TRANG NHÂN DÂN SỐ
+ * Cấu trúc: 
+ * - db_ls: Thông tin hiển thị danh sách (nhẹ, nhanh)
+ * - db_qq: Thông tin quê quán (truy xuất theo ID)
+ * - db_dc: Thông tin an nghỉ & tiểu sử (truy xuất theo ID)
+ */
+
+// Link ảnh hoa sen mặc định (Trang trọng)
+const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=200&h=200&fit=crop"; 
+
+// --- PHẦN 1: DANH TÍNH CỐT LÕI (Hiển thị ở trang chủ) ---
 export const db_ls = [
-    { id: "0001", name: "Võ Thị Sáu", type: "liệt sĩ", birth: "1933", death: "1952", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2G4I7XG4O3G6H-Xz7U6J9M9z6X6Y6z6X6Y6z", candles: 4500, flowers: 3200 },
-    { id: "0002", name: "Nguyễn Văn Trỗi", type: "liệt sĩ", birth: "1940", death: "1964", img: "", candles: 3800, flowers: 2100 },
+    { id: "0001", name: "Võ Thị Sáu", type: "liệt sĩ", birth: "1933", death: "1952", img: "https://vcdn1-giaitri.vnecdn.net/2022/01/22/vothisau-1642848415-3893-1642848520.jpg", candles: 4500, flowers: 3200 },
+    { id: "0002", name: "Nguyễn Văn Trỗi", type: "liệt sĩ", birth: "1940", death: "1964", img: "https://upload.wikimedia.org/wikipedia/vi/1/12/Nguyen_Van_Troi.jpg", candles: 3800, flowers: 2100 },
     { id: "0003", name: "Nguyễn Viết Xuân", type: "liệt sĩ", birth: "1933", death: "1964", img: "", candles: 1200, flowers: 850 },
     { id: "0004", name: "Phan Đình Giót", type: "liệt sĩ", birth: "1922", death: "1954", img: "", candles: 2900, flowers: 1500 },
     { id: "0005", name: "Bế Văn Đàn", type: "liệt sĩ", birth: "1931", death: "1953", img: "", candles: 2100, flowers: 1300 },
     { id: "0006", name: "Tô Vĩnh Diện", type: "liệt sĩ", birth: "1924", death: "1954", img: "", candles: 1800, flowers: 900 },
     { id: "0007", name: "Lý Tự Trọng", type: "liệt sĩ", birth: "1914", death: "1931", img: "", candles: 5000, flowers: 4000 },
-    { id: "0008", name: "Đặng Thùy Trâm", type: "liệt sĩ", birth: "1942", death: "1970", img: "", candles: 6200, flowers: 5100 },
+    { id: "0008", name: "Đặng Thùy Trâm", type: "liệt sĩ", birth: "1942", death: "1970", img: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/44/14/66/44146602-0e9f-72f8-8547-195c808f062f/cover.jpg/400x400cc.jpg", candles: 6200, flowers: 5100 },
     { id: "0009", name: "Nguyễn Văn Thạc", type: "liệt sĩ", birth: "1952", death: "1972", img: "", candles: 3400, flowers: 2200 },
     { id: "0010", name: "Kim Đồng", type: "liệt sĩ", birth: "1929", death: "1943", img: "", candles: 4100, flowers: 3300 },
     { id: "0011", name: "Trần Can", type: "liệt sĩ", birth: "1931", death: "1954", img: "", candles: 950, flowers: 400 },
@@ -15,28 +26,24 @@ export const db_ls = [
     { id: "0013", name: "Lê Văn Tám", type: "dân thường", birth: "1932", death: "1945", img: "", candles: 8000, flowers: 4500 },
     { id: "0014", name: "Nguyễn Bá Ngọc", type: "liệt sĩ", birth: "1952", death: "1964", img: "", candles: 1500, flowers: 900 },
     { id: "0015", name: "La Văn Cầu", type: "liệt sĩ", birth: "1932", death: "Đang sống", img: "", candles: 2300, flowers: 1100 },
-    { id: "0016", name: "Cù Chính Lan", type: "liệt sĩ", birth: "1930", death: "1952", img: "", candles: 1900, flowers: 800 },
-    { id: "0017", name: "Nguyễn Thị Minh Khai", type: "liệt sĩ", birth: "1910", death: "1941", img: "", candles: 4400, flowers: 2900 },
-    { id: "0018", name: "Lê Hồng Phong", type: "liệt sĩ", birth: "1902", death: "1942", img: "", candles: 3100, flowers: 1500 },
-    { id: "0019", name: "Moritz Schlesinger", type: "người nước ngoài", birth: "1886", death: "1948", img: "", candles: 500, flowers: 200 },
-    { id: "0020", name: "Phạm Ngọc Thảo", type: "kiều bào", birth: "1922", death: "1965", img: "", candles: 1200, flowers: 600 },
 ];
 
-// Tạo 180 người mẫu để test hiệu năng cuộn (Scroll)
-for(let i = 21; i <= 200; i++) {
+// TỰ ĐỘNG SINH DỮ LIỆU ĐẾN 200 NGƯỜI ĐỂ TEST
+for (let i = 16; i <= 200; i++) {
+    const id = i.toString().padStart(4, '0');
     db_ls.push({
-        id: i.toString().padStart(4, '0'),
+        id: id,
         name: `Liệt sĩ mẫu số ${i}`,
-        type: i % 5 === 0 ? "kiều bào" : "liệt sĩ",
+        type: i % 10 === 0 ? "kiều bào" : (i % 7 === 0 ? "người nước ngoài" : "liệt sĩ"),
         birth: "19xx",
         death: "19xx",
-        img: "",
+        img: "", // Để trống để hiện hoa sen
         candles: Math.floor(Math.random() * 500),
         flowers: Math.floor(Math.random() * 300)
     });
 }
 
-// PART 2: QUÊ QUÁN
+// --- PHẦN 2: QUÊ QUÁN (db_qq) ---
 export const db_qq = {
     "0001": { p: "Bà Rịa - Vũng Tàu", d: "Đất Đỏ", c: "Phước Long Thọ" },
     "0002": { p: "Quảng Nam", d: "Điện Bàn", c: "Thanh Quýt" },
@@ -48,14 +55,13 @@ export const db_qq = {
     "0008": { p: "Hà Nội", d: "Ba Đình", c: "Đội Cấn" },
     "0009": { p: "Hà Nội", d: "Từ Liêm", c: "Cổ Nhuế" },
     "0010": { p: "Cao Bằng", d: "Hà Quảng", c: "Trường Hà" },
-    // Dữ liệu mặc định cho các dòng test
 };
-// Thêm quê quán cho các mẫu
-for(let i = 11; i <= 200; i++) {
-    db_qq[i.toString().padStart(4, '0')] = { p: "Tỉnh mẫu", d: "Huyện mẫu", c: "Xã mẫu" };
+// Loop tạo quê quán mẫu cho 200 người
+for (let i = 11; i <= 200; i++) {
+    db_qq[i.toString().padStart(4, '0')] = { p: "Địa phương mẫu", d: "Huyện", c: "Xã" };
 }
 
-// PART 3: CHI TIẾT & TIỂU SỬ
+// --- PHẦN 3: CHI TIẾT AN NGHỈ & TIỂU SỬ (db_dc) ---
 export const db_dc = {
     "0001": { r: "Nghĩa trang Hàng Dương", ct: "Việt Nam", bio: "Nữ anh hùng huyền thoại vùng Đất Đỏ, hy sinh tại nhà tù Côn Đảo." },
     "0002": { r: "Nghĩa trang liệt sĩ TP.HCM", ct: "Việt Nam", bio: "Người thợ điện anh hùng với lời hô bất tử trên pháp trường Chí Hòa." },
@@ -68,6 +74,7 @@ export const db_dc = {
     "0009": { r: "Nghĩa trang liệt sĩ Nhổn", ct: "Việt Nam", bio: "Liệt sĩ, tác giả 'Mãi mãi tuổi hai mươi', hy sinh tại Thành cổ Quảng Trị." },
     "0010": { r: "Khu di tích Kim Đồng, Cao Bằng", ct: "Việt Nam", bio: "Người đội trưởng đầu tiên của Đội Thiếu niên Tiền phong Hồ Chí Minh." },
 };
-for(let i = 11; i <= 200; i++) {
-    db_dc[i.toString().padStart(4, '0')] = { r: "Nơi an nghỉ mẫu", ct: "Việt Nam", bio: "Thông tin chi tiết đang được cập nhật..." };
+// Loop tạo dữ liệu an nghỉ mẫu cho 200 người
+for (let i = 11; i <= 200; i++) {
+    db_dc[i.toString().padStart(4, '0')] = { r: "Nghĩa trang địa phương", ct: "Việt Nam", bio: "Thông tin đang được xác minh và cập nhật..." };
 }
